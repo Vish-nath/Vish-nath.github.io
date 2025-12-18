@@ -1,19 +1,254 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Vishwanath | Portfolio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vishwanath H | Portfolio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      color: #333;
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: none; /* Hides default cursor */
+    }
+
+    /* ===== Custom Cursor Style ===== */
+    .custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #007BFF;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease-out, background 0.3s;
+      backdrop-filter: blur(2px);
+      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+
+    a:hover ~ .custom-cursor,
+    button:hover ~ .custom-cursor {
+      transform: translate(-50%, -50%) scale(1.6);
+      background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    header {
+      background: #fff;
+      padding: 20px 0;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 999;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #007BFF;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #007BFF;
+      font-weight: 600;
+    }
+
+    section {
+      padding: 120px 20px 60px;
+      text-align: center;
+      animation: fadeInUp 1s ease forwards;
+      opacity: 0;
+    }
+
+    h1, h2 {
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: #007BFF;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin: 10px;
+      display: inline-block;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #0056b3;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .project-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .project-card:hover {
+      transform: scale(1.05);
+    }
+
+    form {
+      max-width: 500px;
+      margin: auto;
+      text-align: left;
+    }
+
+    form input,
+    form textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    footer {
+      background: #f4f4f4;
+      padding: 20px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+    }
+
+    .profile-pic {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin: 20px 0;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
-  <h1>Vishwanath H</h1>
-  <p>Engineering student • Developer • Builder</p>
 
-  <h2>Projects</h2>
-  <ul>
-    <li>
-    
-      <a href="/Web-Chat-Application/">Web Chat Application</a>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">It's Vishwanath's Portfolio</div>
+        <ul class="nav-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 
-    </li>
-  </ul>
+  <section id="hero">
+    <h1>Hello, I'm <span style="color:#007BFF;">Vishwanath Hesamani</span></h1>
+    <img src="https://via.placeholder.com/150" alt="VishwanathH" class="profile-pic">
+    <p>Hungry Learner | Web Developer | Cybersecurity Enthusiast</p>
+    <a href="#projects" class="btn">See My Work</a>
+    <a href="#contact" class="btn">Contact Me</a>
+  </section>
+
+  <section id="about">
+    <h2>About Me</h2>
+    <p>I am a passionate developer and cybersecurity enthusiast who enjoys crafting modern, responsive websites that serve both form and function.</p>
+  </section>
+
+  <section id="projects">
+    <h2>My Projects</h2>
+    <div class="project-grid">
+      <div class="project-card">
+        <h3>Web Chat Application</h3>
+        <p>Real-time chat app with HTML, CSS, and JavaScript. Join chat rooms, talk live, and vibe with it.</p>
+        <a href="https://github.com/Vish-nath/Web-Chat-Application" target="_blank" class="btn">View on GitHub</a>
+        <a href="/Web-Chat-Application/">Web Chat Application</a>
+
+      </div>
+
+      <div class="project-card">
+        <h3>Recipe Book</h3>
+        <p>Simple and tasty—users can view, add, and search recipes with ease using HTML, CSS, and JS.</p>
+        <a href="https://github.com/Vish-nath/RecipeBook" target="_blank" class="btn">View on GitHub</a>
+      </div>
+
+      <div class="project-card">
+        <h3>Simple Calculator</h3>
+        <p>A clean calculator app for basic math operations. No fluff, just math magic.</p>
+        <a href="https://github.com/Vish-nath/Simple-Calculator" target="_blank" class="btn">View on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Me</h2>
+    <form action="https://formspree.io/f/xldjpanv" method="POST">
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+      <button type="submit" class="btn">Send Message</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Vishwanath H. All rights reserved.</p>
+  </footer>
+
+  <!-- Custom Cursor -->
+  <div class="custom-cursor"></div>
+
+  <!-- Cursor Script -->
+  <script>
+    const cursor = document.querySelector('.custom-cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.top = e.clientY + 'px';
+      cursor.style.left = e.clientX + 'px';
+    });
+  </script>
 </body>
 </html>
