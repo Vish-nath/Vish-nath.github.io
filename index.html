@@ -987,11 +987,26 @@ void main() {
       let cursorY = mouseY;
       let isHovered = false;
 
-      window.addEventListener('mousemove', (e) => {
+      window.addEventListener('pointermove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
         dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+        updateHoverState();
       });
+
+      const interactiveSelector = 'a, button, input, textarea, .cyber-interactive, .project-card';
+      function updateHoverState() {
+        const hoveredElement = document.elementFromPoint(mouseX, mouseY);
+        const nextHovered = Boolean(hoveredElement?.closest(interactiveSelector));
+        if (nextHovered === isHovered) return;
+
+        isHovered = nextHovered;
+        cursor.style.borderColor = isHovered ? '#67f4b7' : '#00f2fe';
+        cursor.style.boxShadow = isHovered
+          ? '0 0 25px rgba(103, 244, 183, 0.6)'
+          : '0 0 15px rgba(0, 242, 254, 0.4)';
+      }
+      window.addEventListener('scroll', updateHoverState, { passive: true });
 
       function render() {
         cursorX += (mouseX - cursorX) * 0.2;
@@ -1001,21 +1016,6 @@ void main() {
         requestAnimationFrame(render);
       }
       requestAnimationFrame(render);
-
-      // Interactive targets hover scaling
-      const interactiveElements = document.querySelectorAll('a, button, input, textarea, .cyber-interactive, .project-card');
-      interactiveElements.forEach((el) => {
-        el.addEventListener('mouseenter', () => {
-          isHovered = true;
-          cursor.style.borderColor = '#67f4b7';
-          cursor.style.boxShadow = '0 0 25px rgba(103, 244, 183, 0.6)';
-        });
-        el.addEventListener('mouseleave', () => {
-          isHovered = false;
-          cursor.style.borderColor = '#00f2fe';
-          cursor.style.boxShadow = '0 0 15px rgba(0, 242, 254, 0.4)';
-        });
-      });
 
       // Neon ripple shockwave on click
       window.addEventListener('click', (e) => {
