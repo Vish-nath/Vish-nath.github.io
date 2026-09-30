@@ -1043,17 +1043,8 @@ void main() {
       const headerAvatar = document.querySelector('header img[alt="Profile"]');
       const heroPortrait = document.querySelector('img[alt="Vishwanath P Hesamani profile photograph"]');
       if (headerLogo) {
-        headerLogo.src = 'assets/circuit-board.jpg';
-        headerLogo.alt = '';
-        headerLogo.className = 'profile-mark__symbol';
-        const profileMark = document.createElement('span');
-        profileMark.className = 'profile-mark';
-        profileMark.setAttribute('aria-hidden', 'true');
-        const initials = document.createElement('span');
-        initials.className = 'profile-mark__initials';
-        initials.textContent = 'VH';
-        headerLogo.replaceWith(profileMark);
-        profileMark.append(headerLogo, initials);
+        headerLogo.removeAttribute('src');
+        headerLogo.remove();
       }
       if (headerAvatar && heroPortrait) headerAvatar.src = heroPortrait.src;
 

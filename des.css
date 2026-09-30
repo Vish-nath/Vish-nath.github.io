@@ -119,6 +119,10 @@ header {
   -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
 }
 
+header img[alt="Cyber Sec Logo Icon"] {
+  display: none !important;
+}
+
 nav a {
   position: relative;
   font-family: var(--font-mono);
