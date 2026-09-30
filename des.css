@@ -144,6 +144,74 @@ nav a[aria-current="page"]::before {
   transform: translateX(-50%) scaleX(1);
 }
 
+.profile-mark {
+  position: relative;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  place-items: center;
+  isolation: isolate;
+}
+
+.profile-mark::before {
+  position: absolute;
+  z-index: -1;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--color-primary-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.5), inset 0 0 12px rgba(0, 242, 254, 0.2);
+  content: '';
+  opacity: 0;
+  animation: profile-mark-ring 0.85s 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.profile-mark__symbol,
+.profile-mark__initials {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.profile-mark__symbol {
+  object-fit: contain;
+  animation: profile-mark-collapse 0.8s cubic-bezier(0.6, 0, 0.4, 1) both;
+}
+
+.profile-mark__initials {
+  display: grid;
+  place-items: center;
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(0, 242, 254, 0.8);
+  opacity: 0;
+  transform: scale(0.45) rotate(-18deg);
+  animation: profile-mark-resolve 0.7s 0.78s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes profile-mark-collapse {
+  0%, 16% { opacity: 1; transform: scale(1) rotate(0); filter: brightness(1); }
+  62% { opacity: 0.9; transform: scale(0.22) rotate(90deg); filter: brightness(2.2); }
+  100% { opacity: 0; transform: scale(0.08) rotate(135deg); filter: brightness(2.2); }
+}
+
+@keyframes profile-mark-ring {
+  0% { opacity: 0; transform: scale(0.15); }
+  45% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 0.65; transform: scale(1); }
+}
+
+@keyframes profile-mark-resolve {
+  0% { opacity: 0; transform: scale(0.45) rotate(-18deg); filter: blur(5px); }
+  72% { opacity: 1; transform: scale(1.14) rotate(3deg); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
+}
+
 .bg-surface-glass,
 .project-card {
   background: var(--color-surface-glass) !important;
@@ -354,5 +422,26 @@ label {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .profile-mark__symbol,
+  .profile-mark::before,
+  .profile-mark__initials {
+    animation: none !important;
+  }
+
+  .profile-mark__symbol {
+    opacity: 0;
+  }
+
+  .profile-mark::before {
+    opacity: 0.65;
+    transform: none;
+  }
+
+  .profile-mark__initials {
+    opacity: 1;
+    filter: none;
+    transform: none;
   }
 }
