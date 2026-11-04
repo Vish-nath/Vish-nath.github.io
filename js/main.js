@@ -1,17 +1,18 @@
 /**
  * Vishwanath P Hesamani - Portfolio Main Script
- * Handles Interactive Background Canvas, ScrollSpy Navigation, and Custom Cursor Effects.
+ * Handles Dynamic Background Canvas, ScrollSpy Navigation, and Hardware-Accelerated Cursor Effects.
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-  // 1. Dynamic Retro Pixel / Developer Background
+  // 1. Dynamic Interactive Retro Pixel & Energy Grid Background
   const canvas = document.getElementById('bg-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
     let width = 0;
     let height = 0;
     let particles = [];
-    let mouse = { x: -1000, y: -1000 };
+    let canvasRipples = [];
+    let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000 };
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -27,32 +28,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initParticles() {
       particles = [];
-      const particleCount = Math.min(Math.floor((width * height) / 20000), 60);
+      const particleCount = Math.min(Math.floor((width * height) / 18000), 65);
       const types = ['square', 'square', 'square', 'char', 'char'];
-      const chars = ['{', '}', '<', '>', '/', '0', '1', ';'];
+      const chars = ['{', '}', '<', '>', '/', '0', '1', ';', '#'];
 
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 1.2,
-          vy: (Math.random() - 0.5) * 1.2,
-          size: Math.floor(Math.random() * 3 + 1) * 4, // 4, 8, 12 pixel blocks
+          originY: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          phase: Math.random() * Math.PI * 2,
+          size: Math.floor(Math.random() * 3 + 1) * 4, // 4, 8, 12 px block
           type: types[Math.floor(Math.random() * types.length)],
           char: chars[Math.floor(Math.random() * chars.length)],
           color: i % 3 === 0 ? 'rgba(37, 99, 235, ' : (i % 3 === 1 ? 'rgba(79, 70, 229, ' : 'rgba(5, 150, 105, '),
-          baseAlpha: Math.random() * 0.4 + 0.1
+          baseAlpha: Math.random() * 0.35 + 0.15
         });
       }
     }
 
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+      mouse.targetX = e.clientX;
+      mouse.targetY = e.clientY;
     }, { passive: true });
 
-    function animateCanvas() {
+    // Canvas click ripple effect
+    window.addEventListener('click', (e) => {
+      if (!prefersReducedMotion) {
+        canvasRipples.push({
+          x: e.clientX,
+          y: e.clientY,
+          radius: 10,
+          maxRadius: Math.min(width, height) * 0.35,
+          alpha: 0.6,
+          speed: 6
+        });
+      }
+    }, { passive: true });
+
+    let lastTime = 0;
+    function animateCanvas(time) {
       ctx.clearRect(0, 0, width, height);
 
       if (prefersReducedMotion) {
@@ -64,30 +82,66 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
-      // Draw light retro pixel grid background
-      ctx.strokeStyle = 'rgba(15, 23, 42, 0.03)';
+      // Smooth mouse interpolation for fluid aura movement
+      mouse.x += (mouse.targetX - mouse.x) * 0.1;
+      mouse.y += (mouse.targetY - mouse.y) * 0.1;
+
+      // 1. Draw Subtle Light Retro Grid
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.025)';
       ctx.lineWidth = 1;
       const gridSize = 40;
       ctx.beginPath();
-      for(let x = 0; x < width; x += gridSize) {
+      for (let x = 0; x < width; x += gridSize) {
         ctx.moveTo(x, 0); ctx.lineTo(x, height);
       }
-      for(let y = 0; y < height; y += gridSize) {
+      for (let y = 0; y < height; y += gridSize) {
         ctx.moveTo(0, y); ctx.lineTo(width, y);
       }
       ctx.stroke();
 
+      // 2. Interactive Ambient Radial Glow around mouse
+      if (mouse.x > 0 && mouse.y > 0) {
+        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 220);
+        mouseGlow.addColorStop(0, 'rgba(37, 99, 235, 0.06)');
+        mouseGlow.addColorStop(0.5, 'rgba(79, 70, 229, 0.02)');
+        mouseGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = mouseGlow;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      // 3. Render Canvas Shockwave Ripples
+      for (let r = canvasRipples.length - 1; r >= 0; r--) {
+        const rip = canvasRipples[r];
+        rip.radius += rip.speed;
+        rip.alpha -= 0.015;
+
+        if (rip.alpha <= 0 || rip.radius >= rip.maxRadius) {
+          canvasRipples.splice(r, 1);
+          continue;
+        }
+
+        ctx.strokeStyle = `rgba(79, 70, 229, ${rip.alpha * 0.4})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // 4. Render & Animate Retro Pixel Elements
       ctx.font = "bold 14px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
+      const tSec = time * 0.001;
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
+        // Fluid floating oscillation
         p.x += p.vx;
-        p.y += p.vy;
+        p.y += p.vy + Math.sin(tSec * 1.5 + p.phase) * 0.2;
 
-        // Wrap around screen
+        // Wrap around screen boundaries
         if (p.x < -20) p.x = width + 20;
         if (p.x > width + 20) p.x = -20;
         if (p.y < -20) p.y = height + 20;
@@ -95,9 +149,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         ctx.fillStyle = p.color + p.baseAlpha + ')';
 
-        // Draw retro pixel block or developer char
+        // Draw pixelated elements
         if (p.type === 'square') {
-          // Snap to a grid to make it look like retro 2D pixel movement
           const px = Math.floor(p.x / 4) * 4;
           const py = Math.floor(p.y / 4) * 4;
           ctx.fillRect(px, py, p.size, p.size);
@@ -105,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
           ctx.fillText(p.char, p.x, p.y);
         }
 
-        // Draw orthogonal connections (staircase line) for tech/retro feel
+        // Draw orthogonal circuit lines between close particles
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
@@ -115,24 +168,23 @@ document.addEventListener('DOMContentLoaded', function () {
           if (dist < 110) {
             const alpha = (1 - dist / 110) * 0.15;
             ctx.strokeStyle = `rgba(79, 70, 229, ${alpha})`;
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.2;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
-            // Draw an orthogonal L-shape connection instead of straight line
             ctx.lineTo(p.x, p2.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
         }
 
-        // Mouse hover interaction (orthogonal lines)
+        // Mouse circuit line interaction
         const mdx = p.x - mouse.x;
         const mdy = p.y - mouse.y;
         const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mdist < 140) {
-          const mAlpha = (1 - mdist / 140) * 0.3;
+        if (mdist < 150) {
+          const mAlpha = (1 - mdist / 150) * 0.35;
           ctx.strokeStyle = `rgba(37, 99, 235, ${mAlpha})`;
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p.x, mouse.y);
@@ -177,7 +229,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Animate Indicator dynamically
     const navRect = indicator.parentElement.getBoundingClientRect();
     const linkRect = activeLink.getBoundingClientRect();
 
@@ -196,7 +247,6 @@ document.addEventListener('DOMContentLoaded', function () {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const activeId = entry.target.getAttribute('id');
-          // Use requestAnimationFrame for smooth UI syncing
           requestAnimationFrame(() => {
             updateIndicator(desktopLinks, desktopIndicator, activeId);
             updateIndicator(mobileLinks, mobileIndicator, activeId);
@@ -207,7 +257,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     sections.forEach((sec) => observer.observe(sec));
 
-    // Recalculate indicator positions on window resize
     window.addEventListener('resize', () => {
       requestAnimationFrame(() => {
         const activeDesktop = Array.from(desktopLinks).find(l => l.classList.contains('active-nav'));
@@ -219,12 +268,11 @@ document.addEventListener('DOMContentLoaded', function () {
           updateIndicator(mobileLinks, mobileIndicator, activeMobile.getAttribute('href').replace('#', ''));
         }
       });
-    });
+    }, { passive: true });
   }
 
-  // 3. Custom Cursor Follower & Click Ripple Effect
+  // 3. Hardware-Accelerated Cursor Follower & Ripple Effect
   const follower = document.getElementById('cursor-follower');
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (follower && !prefersReducedMotion) {
     let mouseX = window.innerWidth / 2;
@@ -237,51 +285,42 @@ document.addEventListener('DOMContentLoaded', function () {
       mouseY = e.clientY;
     }, { passive: true });
 
-    const interactiveTags = 'a, button, input, textarea, select, label';
+    const interactiveTags = 'a, button, input, textarea, select, label, .project-card';
     window.addEventListener('mouseover', (e) => {
       if (e.target.closest(interactiveTags)) {
         follower.classList.add('bg-blue-500/10', 'scale-150', 'border-indigo-500/60');
         follower.classList.remove('border-blue-500/40');
       }
-    });
+    }, { passive: true });
+
     window.addEventListener('mouseout', (e) => {
       if (e.target.closest(interactiveTags)) {
         follower.classList.remove('bg-blue-500/10', 'scale-150', 'border-indigo-500/60');
         follower.classList.add('border-blue-500/40');
       }
-    });
+    }, { passive: true });
 
+    // Smooth GPU-accelerated translate3d follower loop (no layout reflows)
     function animateFollower() {
       followerX += (mouseX - followerX) * 0.15;
       followerY += (mouseY - followerY) * 0.15;
-      follower.style.left = `${followerX}px`;
-      follower.style.top = `${followerY}px`;
+
+      follower.style.transform = `translate3d(${followerX}px, ${followerY}px, 0) translate(-50%, -50%)`;
       requestAnimationFrame(animateFollower);
     }
     requestAnimationFrame(animateFollower);
 
+    // Hardware Accelerated Click Shockwave Ripple
     window.addEventListener('click', (e) => {
       const ripple = document.createElement('div');
-      ripple.className = 'pointer-events-none fixed z-[9999] rounded-full border-2 border-indigo-500/80';
-      ripple.style.width = '20px';
-      ripple.style.height = '20px';
-      ripple.style.left = `${e.clientX - 10}px`;
-      ripple.style.top = `${e.clientY - 10}px`;
-      ripple.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
-      ripple.style.opacity = '1';
+      ripple.className = 'click-ripple-element';
+      ripple.style.left = `${e.clientX}px`;
+      ripple.style.top = `${e.clientY}px`;
       document.body.appendChild(ripple);
-
-      requestAnimationFrame(() => {
-        ripple.style.width = '70px';
-        ripple.style.height = '70px';
-        ripple.style.left = `${e.clientX - 35}px`;
-        ripple.style.top = `${e.clientY - 35}px`;
-        ripple.style.opacity = '0';
-      });
 
       setTimeout(() => {
         ripple.remove();
-      }, 400);
-    });
+      }, 450);
+    }, { passive: true });
   }
 });

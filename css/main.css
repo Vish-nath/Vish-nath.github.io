@@ -259,7 +259,7 @@ textarea::placeholder {
   color: var(--color-text-muted) !important;
 }
 
-/* Animations */
+/* Animations & Hardware Acceleration */
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.7; transform: scale(0.96); }
@@ -267,6 +267,45 @@ textarea::placeholder {
 
 .animate-pulse-subtle {
   animation: pulse-subtle 3s infinite ease-in-out;
+}
+
+/* GPU Hardware Acceleration Hints */
+#cursor-follower {
+  will-change: transform;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#nav-indicator, #mobile-nav-indicator {
+  will-change: transform, width;
+}
+
+.project-card, .info-card {
+  will-change: transform, box-shadow;
+}
+
+/* GPU Accelerated Ripple Animation */
+@keyframes click-ripple-anim {
+  0% {
+    transform: translate3d(-50%, -50%, 0) scale(0.2);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(-50%, -50%, 0) scale(3.5);
+    opacity: 0;
+  }
+}
+
+.click-ripple-element {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(79, 70, 229, 0.85);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
+  animation: click-ripple-anim 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 /* Responsive adjustments */
