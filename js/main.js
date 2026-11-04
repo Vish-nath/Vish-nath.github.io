@@ -148,11 +148,44 @@ document.addEventListener('DOMContentLoaded', function () {
     requestAnimationFrame(animateCanvas);
   }
 
-  // 2. Active Section Navigation Observer (ScrollSpy)
+  // 2. Active Section Navigation Observer (ScrollSpy) & Animated Indicators
   const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('#main-nav a[href^="#"]');
 
-  if (sections.length && navLinks.length) {
+  const desktopNav = document.getElementById('main-nav');
+  const desktopLinks = desktopNav ? desktopNav.querySelectorAll('a[href^="#"]') : [];
+  const desktopIndicator = document.getElementById('nav-indicator');
+
+  const mobileNav = document.getElementById('mobile-nav');
+  const mobileLinks = mobileNav ? mobileNav.querySelectorAll('a[href^="#"]') : [];
+  const mobileIndicator = document.getElementById('mobile-nav-indicator');
+
+  function updateIndicator(links, indicator, activeId) {
+    if (!indicator || links.length === 0) return;
+
+    let activeLink = Array.from(links).find(link => link.getAttribute('href').replace('#', '') === activeId);
+    if (!activeLink) activeLink = links[0]; // fallback to first tab
+
+    links.forEach(link => {
+      if (link === activeLink) {
+        link.classList.add('active-nav');
+        link.classList.remove('text-slate-700');
+        link.classList.add('text-blue-600');
+      } else {
+        link.classList.remove('active-nav');
+        link.classList.add('text-slate-700');
+        link.classList.remove('text-blue-600');
+      }
+    });
+
+    // Animate Indicator dynamically
+    const navRect = indicator.parentElement.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+
+    indicator.style.width = `${linkRect.width}px`;
+    indicator.style.transform = `translateX(${linkRect.left - navRect.left}px)`;
+  }
+
+  if (sections.length) {
     const observerOptions = {
       root: null,
       rootMargin: '-20% 0px -70% 0px',
@@ -163,19 +196,30 @@ document.addEventListener('DOMContentLoaded', function () {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const activeId = entry.target.getAttribute('id');
-          navLinks.forEach((link) => {
-            const href = link.getAttribute('href').replace('#', '');
-            if (href === activeId) {
-              link.classList.add('active-nav');
-            } else {
-              link.classList.remove('active-nav');
-            }
+          // Use requestAnimationFrame for smooth UI syncing
+          requestAnimationFrame(() => {
+            updateIndicator(desktopLinks, desktopIndicator, activeId);
+            updateIndicator(mobileLinks, mobileIndicator, activeId);
           });
         }
       });
     }, observerOptions);
 
     sections.forEach((sec) => observer.observe(sec));
+
+    // Recalculate indicator positions on window resize
+    window.addEventListener('resize', () => {
+      requestAnimationFrame(() => {
+        const activeDesktop = Array.from(desktopLinks).find(l => l.classList.contains('active-nav'));
+        if (activeDesktop && desktopIndicator) {
+          updateIndicator(desktopLinks, desktopIndicator, activeDesktop.getAttribute('href').replace('#', ''));
+        }
+        const activeMobile = Array.from(mobileLinks).find(l => l.classList.contains('active-nav'));
+        if (activeMobile && mobileIndicator) {
+          updateIndicator(mobileLinks, mobileIndicator, activeMobile.getAttribute('href').replace('#', ''));
+        }
+      });
+    });
   }
 
   // 3. Custom Cursor Follower & Click Ripple Effect
