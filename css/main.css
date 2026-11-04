@@ -124,18 +124,64 @@ nav a.active-nav {
   color: var(--color-primary);
 }
 
-#nav-indicator {
+#nav-indicator, #mobile-nav-indicator {
   position: absolute;
-  top: 6px;
-  bottom: 6px;
-  left: 0;
+  left: -6px; /* Align with nav border-box since nav has 6px padding */
   width: 0;
-  background-color: white;
-  border-radius: 9999px;
-  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.15), inset 0 1px 0 rgba(255,255,255,1);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy dynamic animation */
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  transition: all 0.5s cubic-bezier(0.5, 1.5, 0.4, 1);
   z-index: 0;
   pointer-events: none;
+}
+
+/* Desktop: Top Notch */
+#nav-indicator {
+  top: -6px;
+  height: calc(100% + 6px);
+  border-radius: 0 0 16px 16px;
+}
+#nav-indicator::before,
+#nav-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+}
+#nav-indicator::before {
+  left: -16px;
+  background: radial-gradient(circle at 0% 100%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
+}
+#nav-indicator::after {
+  right: -16px;
+  background: radial-gradient(circle at 100% 100%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
+}
+
+/* Mobile: Bottom Notch */
+#mobile-nav-indicator {
+  bottom: -6px;
+  height: calc(100% + 6px);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 12px rgba(37, 99, 235, 0.15);
+}
+#mobile-nav-indicator::before,
+#mobile-nav-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+}
+#mobile-nav-indicator::before {
+  left: -16px;
+  background: radial-gradient(circle at 0% 0%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
+}
+#mobile-nav-indicator::after {
+  right: -16px;
+  background: radial-gradient(circle at 100% 0%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
 }
 
 /* Cards & Surfaces */
