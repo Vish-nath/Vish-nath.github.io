@@ -44,6 +44,9 @@
   <!-- Interactive Dynamic Background Canvas -->
   <canvas id="bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none -z-10"></canvas>
 
+  <!-- Custom Cursor Follower & Effects -->
+  <div id="cursor-follower" class="pointer-events-none fixed z-[9999] w-8 h-8 rounded-full border-2 border-blue-500/40 transition-transform duration-200 ease-out transform -translate-x-1/2 -translate-y-1/2 hidden md:block"></div>
+
   <!-- Navigation Header -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-md border-b border-slate-200 transition-all duration-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
@@ -1015,6 +1018,67 @@
         }, observerOptions);
 
         sections.forEach(sec => observer.observe(sec));
+      }
+
+      // 3. Custom Cursor Follower & Click Ripple
+      const follower = document.getElementById('cursor-follower');
+      if (follower && !prefersReducedMotion) {
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let followerX = mouseX;
+        let followerY = mouseY;
+
+        window.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        }, { passive: true });
+
+        const interactiveTags = 'a, button, input, textarea, select, label';
+        window.addEventListener('mouseover', (e) => {
+          if (e.target.closest(interactiveTags)) {
+            follower.classList.add('bg-blue-500/10', 'scale-150', 'border-indigo-500/60');
+            follower.classList.remove('border-blue-500/40');
+          }
+        });
+        window.addEventListener('mouseout', (e) => {
+          if (e.target.closest(interactiveTags)) {
+            follower.classList.remove('bg-blue-500/10', 'scale-150', 'border-indigo-500/60');
+            follower.classList.add('border-blue-500/40');
+          }
+        });
+
+        function animateFollower() {
+          followerX += (mouseX - followerX) * 0.15;
+          followerY += (mouseY - followerY) * 0.15;
+          follower.style.left = `${followerX}px`;
+          follower.style.top = `${followerY}px`;
+          requestAnimationFrame(animateFollower);
+        }
+        requestAnimationFrame(animateFollower);
+
+        window.addEventListener('click', (e) => {
+          const ripple = document.createElement('div');
+          ripple.className = 'pointer-events-none fixed z-[9999] rounded-full border-2 border-indigo-500/80';
+          ripple.style.width = '20px';
+          ripple.style.height = '20px';
+          ripple.style.left = `${e.clientX - 10}px`;
+          ripple.style.top = `${e.clientY - 10}px`;
+          ripple.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+          ripple.style.opacity = '1';
+          document.body.appendChild(ripple);
+
+          requestAnimationFrame(() => {
+            ripple.style.width = '70px';
+            ripple.style.height = '70px';
+            ripple.style.left = `${e.clientX - 35}px`;
+            ripple.style.top = `${e.clientY - 35}px`;
+            ripple.style.opacity = '0';
+          });
+
+          setTimeout(() => {
+            ripple.remove();
+          }, 400);
+        });
       }
     })();
   </script>
