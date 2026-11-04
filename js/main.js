@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const linkRect = activeLink.getBoundingClientRect();
 
     indicator.style.width = `${linkRect.width}px`;
-    indicator.style.transform = `translateX(${linkRect.left - navRect.left}px)`;
+    indicator.style.transform = `translate3d(${linkRect.left - navRect.left}px, 0, 0)`;
   }
 
   if (sections.length) {

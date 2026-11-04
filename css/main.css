@@ -130,7 +130,9 @@ nav a.active-nav {
   width: 0;
   background-color: rgba(255, 255, 255, 0.95);
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-  transition: all 0.5s cubic-bezier(0.5, 1.5, 0.4, 1);
+  /* Optimized transition only targeting hardware accelerated properties + width */
+  transition: transform 0.45s cubic-bezier(0.5, 1.5, 0.4, 1), width 0.45s cubic-bezier(0.5, 1.5, 0.4, 1);
+  will-change: transform, width;
   z-index: 0;
   pointer-events: none;
 }
