@@ -4,7 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-  // 1. Dynamic Light Particle Constellation Background
+  // 1. Dynamic Retro Pixel / Developer Background
   const canvas = document.getElementById('bg-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
@@ -27,17 +27,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initParticles() {
       particles = [];
-      const particleCount = Math.min(Math.floor((width * height) / 18000), 75);
+      const particleCount = Math.min(Math.floor((width * height) / 20000), 60);
+      const types = ['square', 'square', 'square', 'char', 'char'];
+      const chars = ['{', '}', '<', '>', '/', '0', '1', ';'];
 
       for (let i = 0; i < particleCount; i++) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          radius: Math.random() * 1.8 + 1,
+          vx: (Math.random() - 0.5) * 1.2,
+          vy: (Math.random() - 0.5) * 1.2,
+          size: Math.floor(Math.random() * 3 + 1) * 4, // 4, 8, 12 pixel blocks
+          type: types[Math.floor(Math.random() * types.length)],
+          char: chars[Math.floor(Math.random() * chars.length)],
           color: i % 3 === 0 ? 'rgba(37, 99, 235, ' : (i % 3 === 1 ? 'rgba(79, 70, 229, ' : 'rgba(5, 150, 105, '),
-          baseAlpha: Math.random() * 0.35 + 0.15
+          baseAlpha: Math.random() * 0.4 + 0.1
         });
       }
     }
@@ -60,47 +64,79 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
+      // Draw light retro pixel grid background
+      ctx.strokeStyle = 'rgba(15, 23, 42, 0.03)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      ctx.beginPath();
+      for(let x = 0; x < width; x += gridSize) {
+        ctx.moveTo(x, 0); ctx.lineTo(x, height);
+      }
+      for(let y = 0; y < height; y += gridSize) {
+        ctx.moveTo(0, y); ctx.lineTo(width, y);
+      }
+      ctx.stroke();
+
+      ctx.font = "bold 14px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
         p.x += p.vx;
         p.y += p.vy;
 
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
+        // Wrap around screen
+        if (p.x < -20) p.x = width + 20;
+        if (p.x > width + 20) p.x = -20;
+        if (p.y < -20) p.y = height + 20;
+        if (p.y > height + 20) p.y = -20;
 
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = p.color + p.baseAlpha + ')';
-        ctx.fill();
 
+        // Draw retro pixel block or developer char
+        if (p.type === 'square') {
+          // Snap to a grid to make it look like retro 2D pixel movement
+          const px = Math.floor(p.x / 4) * 4;
+          const py = Math.floor(p.y / 4) * 4;
+          ctx.fillRect(px, py, p.size, p.size);
+        } else {
+          ctx.fillText(p.char, p.x, p.y);
+        }
+
+        // Draw orthogonal connections (staircase line) for tech/retro feel
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 130) {
-            const alpha = (1 - dist / 130) * 0.12;
+          if (dist < 110) {
+            const alpha = (1 - dist / 110) * 0.15;
+            ctx.strokeStyle = `rgba(79, 70, 229, ${alpha})`;
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
+            // Draw an orthogonal L-shape connection instead of straight line
+            ctx.lineTo(p.x, p2.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(37, 99, 235, ${alpha})`;
-            ctx.lineWidth = 0.8;
             ctx.stroke();
           }
         }
 
+        // Mouse hover interaction (orthogonal lines)
         const mdx = p.x - mouse.x;
         const mdy = p.y - mouse.y;
         const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
         if (mdist < 140) {
-          const mAlpha = (1 - mdist / 140) * 0.25;
+          const mAlpha = (1 - mdist / 140) * 0.3;
+          ctx.strokeStyle = `rgba(37, 99, 235, ${mAlpha})`;
+          ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x, mouse.y);
           ctx.lineTo(mouse.x, mouse.y);
-          ctx.strokeStyle = `rgba(37, 99, 235, ${mAlpha})`;
-          ctx.lineWidth = 1;
           ctx.stroke();
         }
       }
