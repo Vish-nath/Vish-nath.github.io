@@ -50,50 +50,51 @@
   <div id="cursor-follower" class="pointer-events-none fixed z-[9999] w-8 h-8 rounded-full border-2 border-blue-500/40 transition-transform duration-200 ease-out transform -translate-x-1/2 -translate-y-1/2 hidden md:block"></div>
 
   <!-- Navigation Header -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-white/85 backdrop-blur-md border-b border-slate-200 transition-all duration-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-4">
+  <header class="fixed top-4 left-0 right-0 z-50 transition-all duration-300 pointer-events-none">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 pointer-events-auto">
 
       <!-- Brand Logo & Name -->
-      <a href="#" class="flex items-center gap-3 group">
-        <img src="assets/images/profile.jpg" alt="Vishwanath P Hesamani" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-blue-500/20 group-hover:ring-blue-500/50 transition-all shadow-sm"/>
+      <a href="#" class="frosted-glass-panel rounded-full pl-1.5 pr-5 py-1.5 flex items-center gap-3 group transition-transform hover:scale-105 active:scale-95 shadow-md">
+        <img src="assets/images/profile.jpg" alt="Vishwanath P Hesamani" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-blue-500/20 group-hover:ring-blue-500/50 transition-all"/>
         <div class="flex flex-col">
-          <span class="font-display font-bold text-slate-900 text-base sm:text-lg tracking-tight group-hover:text-blue-600 transition-colors">
-            Vishwanath P Hesamani
-          </span>
-          <span class="text-xs text-slate-500 font-medium hidden sm:inline-block">
-            CS Student &amp; Full-Stack Dev
+          <span class="font-display font-bold text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-blue-600 transition-colors">
+            Vishwanath P.H.
           </span>
         </div>
       </a>
 
-      <!-- Desktop Navigation Links -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium" id="main-nav">
-        <a href="#about" class="text-slate-600 hover:text-blue-600 transition-colors py-1">About</a>
-        <a href="#skills" class="text-slate-600 hover:text-blue-600 transition-colors py-1">Skills</a>
-        <a href="#projects" class="text-slate-600 hover:text-blue-600 transition-colors py-1">Projects</a>
-        <a href="#contact" class="text-slate-600 hover:text-blue-600 transition-colors py-1">Contact</a>
+      <!-- Desktop Navigation Links (Frosted Tabs) -->
+      <nav class="hidden md:flex relative items-center p-1.5 frosted-glass-panel rounded-full shadow-md" id="main-nav">
+        <div id="nav-indicator"></div>
+        <a href="#about" class="relative z-10 px-5 py-2 rounded-full text-slate-700 hover:text-blue-600 transition-colors text-sm font-semibold">About</a>
+        <a href="#skills" class="relative z-10 px-5 py-2 rounded-full text-slate-700 hover:text-blue-600 transition-colors text-sm font-semibold">Skills</a>
+        <a href="#projects" class="relative z-10 px-5 py-2 rounded-full text-slate-700 hover:text-blue-600 transition-colors text-sm font-semibold">Projects</a>
+        <a href="#contact" class="relative z-10 px-5 py-2 rounded-full text-slate-700 hover:text-blue-600 transition-colors text-sm font-semibold">Contact</a>
       </nav>
 
       <!-- Status Badge & CTA -->
-      <div class="flex items-center gap-3">
-        <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/80 text-xs text-emerald-700 font-medium">
+      <div class="flex items-center gap-2 frosted-glass-panel rounded-full p-1.5 shadow-md">
+        <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-200/50 text-xs text-emerald-700 font-semibold">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Available for Internships</span>
+          <span>Available</span>
         </div>
-        <a href="#contact" class="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm hover:shadow">
+        <a href="#contact" class="inline-flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-bold rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-transform shadow-sm hover:scale-105 active:scale-95">
           Get in Touch
         </a>
       </div>
     </div>
-
-    <!-- Mobile Sub-Navigation Bar -->
-    <div class="md:hidden flex items-center justify-around border-t border-slate-100 bg-white/95 px-4 py-2 text-xs font-medium text-slate-600">
-      <a href="#about" class="hover:text-blue-600 py-1">About</a>
-      <a href="#skills" class="hover:text-blue-600 py-1">Skills</a>
-      <a href="#projects" class="hover:text-blue-600 py-1">Projects</a>
-      <a href="#contact" class="hover:text-blue-600 py-1">Contact</a>
-    </div>
   </header>
+
+  <!-- Mobile Bottom Floating Navigation (Frosted Tabs) -->
+  <div class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm pointer-events-auto">
+    <nav class="relative flex items-center justify-around frosted-glass-panel rounded-full p-1.5 shadow-xl" id="mobile-nav">
+      <div id="mobile-nav-indicator" class="absolute top-1.5 bottom-1.5 left-0 bg-white rounded-full shadow-sm border border-slate-200/50 transition-all duration-400 ease-out z-0 pointer-events-none" style="transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
+      <a href="#about" class="relative z-10 flex-1 text-center py-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">About</a>
+      <a href="#skills" class="relative z-10 flex-1 text-center py-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">Skills</a>
+      <a href="#projects" class="relative z-10 flex-1 text-center py-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">Projects</a>
+      <a href="#contact" class="relative z-10 flex-1 text-center py-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">Contact</a>
+    </nav>
+  </div>
 
   <!-- Main Content Area -->
   <main class="w-full pt-28 sm:pt-32">
