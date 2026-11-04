@@ -271,56 +271,48 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { passive: true });
   }
 
-  // 3. Hardware-Accelerated Cursor Follower & Ripple Effect
-  const follower = document.getElementById('cursor-follower');
+  // 3. New Popular Cursor Follow Up Animation (Ring)
+  const cursorRing = document.getElementById('cursor-ring');
 
-  if (follower && !prefersReducedMotion) {
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let followerX = mouseX;
-    let followerY = mouseY;
+  if (cursorRing && !prefersReducedMotion && window.matchMedia('(pointer: fine)').matches) {
+    let mouseX = -100;
+    let mouseY = -100;
+    let ringX = -100;
+    let ringY = -100;
 
+    // Show cursor ring when mouse moves
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      if (cursorRing.classList.contains('opacity-0')) {
+        cursorRing.classList.remove('opacity-0');
+        cursorRing.classList.add('opacity-100');
+      }
     }, { passive: true });
 
-    const interactiveTags = 'a, button, input, textarea, select, label, .project-card';
+    const interactiveTags = 'a, button, input, textarea, select, label, .project-card, .frosted-glass-panel';
     window.addEventListener('mouseover', (e) => {
       if (e.target.closest(interactiveTags)) {
-        follower.classList.add('bg-blue-500/10', 'scale-150', 'border-indigo-500/60');
-        follower.classList.remove('border-blue-500/40');
+        cursorRing.classList.add('hover-active');
       }
     }, { passive: true });
 
     window.addEventListener('mouseout', (e) => {
       if (e.target.closest(interactiveTags)) {
-        follower.classList.remove('bg-blue-500/10', 'scale-150', 'border-indigo-500/60');
-        follower.classList.add('border-blue-500/40');
+        cursorRing.classList.remove('hover-active');
       }
     }, { passive: true });
 
-    // Smooth GPU-accelerated translate3d follower loop (no layout reflows)
-    function animateFollower() {
-      followerX += (mouseX - followerX) * 0.15;
-      followerY += (mouseY - followerY) * 0.15;
+    // Smooth GPU-accelerated translate3d follower loop
+    function animateCursorRing() {
+      // Smooth linear interpolation for the trailing effect
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
 
-      follower.style.transform = `translate3d(${followerX}px, ${followerY}px, 0) translate(-50%, -50%)`;
-      requestAnimationFrame(animateFollower);
+      // Translate by center
+      cursorRing.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0)`;
+      requestAnimationFrame(animateCursorRing);
     }
-    requestAnimationFrame(animateFollower);
-
-    // Hardware Accelerated Click Shockwave Ripple
-    window.addEventListener('click', (e) => {
-      const ripple = document.createElement('div');
-      ripple.className = 'click-ripple-element';
-      ripple.style.left = `${e.clientX}px`;
-      ripple.style.top = `${e.clientY}px`;
-      document.body.appendChild(ripple);
-
-      setTimeout(() => {
-        ripple.remove();
-      }, 450);
-    }, { passive: true });
+    requestAnimationFrame(animateCursorRing);
   }
 });
