@@ -98,13 +98,13 @@ header > * {
   pointer-events: auto; /* Re-enable clicks on header contents */
 }
 
-/* Base Frosted Container */
+/* Base Frosted Container (Sky Blue Tint) */
 .frosted-glass-panel {
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(224, 242, 254, 0.6); /* Tailwind sky-100 with opacity */
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.7);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 30px -10px rgba(14, 165, 233, 0.15), inset 0 1px 0 rgba(255,255,255,0.8);
 }
 
 nav a {
@@ -126,7 +126,7 @@ nav a.active-nav {
   left: -6px; /* Align with nav border-box since nav has 6px padding */
   width: 0;
   background-color: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25); /* Sky blue shadow */
   /* Optimized transition only targeting hardware accelerated properties + width */
   transition: transform 0.45s cubic-bezier(0.5, 1.5, 0.4, 1), width 0.45s cubic-bezier(0.5, 1.5, 0.4, 1);
   will-change: transform, width;
@@ -134,28 +134,28 @@ nav a.active-nav {
   pointer-events: none;
 }
 
-/* Desktop: Top Notch */
+/* Desktop: Bottom Notch (Upside Down Water Drop) */
 #nav-indicator {
-  top: -6px;
+  bottom: -6px; /* Moved to bottom */
   height: calc(100% + 6px);
-  border-radius: 0 0 16px 16px;
+  border-radius: 16px 16px 0 0; /* Flipped border radius */
 }
 #nav-indicator::before,
 #nav-indicator::after {
   content: '';
   position: absolute;
-  top: 0;
+  bottom: 0; /* Anchored to bottom */
   width: 16px;
   height: 16px;
   background: transparent;
 }
 #nav-indicator::before {
   left: -16px;
-  background: radial-gradient(circle at 0% 100%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
+  background: radial-gradient(circle at 0% 0%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
 }
 #nav-indicator::after {
   right: -16px;
-  background: radial-gradient(circle at 100% 100%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
+  background: radial-gradient(circle at 100% 0%, transparent 15.5px, rgba(255, 255, 255, 0.95) 16px);
 }
 
 /* Mobile: Bottom Notch */
