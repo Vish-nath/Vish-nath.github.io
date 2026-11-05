@@ -39,16 +39,16 @@ document.addEventListener('DOMContentLoaded', function () {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          // Upward drift to simulate 2D platformer parallax or scrolling terminal
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: -(Math.random() * 0.6 + 0.2),
+          // Upward drift to simulate 2D platformer parallax or scrolling terminal (Slowed Down)
+          vx: (Math.random() - 0.5) * 0.15,
+          vy: -(Math.random() * 0.25 + 0.1),
           phase: Math.random() * Math.PI * 2,
           size: Math.floor(Math.random() * 2 + 1) * 6, // 6px or 12px retro blocks
           type: types[Math.floor(Math.random() * types.length)],
           text: devStrings[Math.floor(Math.random() * devStrings.length)],
           color: colorVal,
           baseAlpha: Math.random() * 0.3 + 0.1,
-          pulseSpeed: Math.random() * 0.05 + 0.02
+          pulseSpeed: Math.random() * 0.02 + 0.01 // Slower blinking/matrix effect
         });
       }
     }
@@ -94,8 +94,8 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.strokeStyle = 'rgba(37, 99, 235, 0.04)'; // Subtle blue tint matching background
       ctx.lineWidth = 1;
       const gridSize = 40;
-      // Calculate scroll offset based on time to simulate 2D camera movement (moving up)
-      const scrollY = (time * 0.02) % gridSize;
+      // Calculate scroll offset based on time to simulate 2D camera movement (moving up - slowed down)
+      const scrollY = (time * 0.008) % gridSize;
 
       ctx.beginPath();
       for (let x = 0; x < width; x += gridSize) {
@@ -146,8 +146,8 @@ document.addEventListener('DOMContentLoaded', function () {
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Fluid floating with subtle horizontal sine wave
-        p.x += p.vx + Math.sin(tSec + p.phase) * 0.3;
+        // Fluid floating with subtle horizontal sine wave (Slowed down oscillation)
+        p.x += p.vx + Math.sin(tSec * 0.5 + p.phase) * 0.15;
         p.y += p.vy;
 
         // Wrap around screen boundaries cleanly
