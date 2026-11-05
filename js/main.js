@@ -250,6 +250,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     sections.forEach((sec) => observer.observe(sec));
 
+    // Custom Smooth Scrolling for Navigation Links
+    const allNavLinks = [...desktopLinks, ...mobileLinks];
+    allNavLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent default instant jump
+
+        const targetId = this.getAttribute('href');
+        if (!targetId || targetId === '#') return;
+
+        const targetSection = document.querySelector(targetId);
+        if (targetSection) {
+          // Adjust offset to account for fixed header (approx 100px)
+          const headerOffset = 100;
+          const elementPosition = targetSection.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
     window.addEventListener('resize', () => {
       requestAnimationFrame(() => {
         const activeDesktop = Array.from(desktopLinks).find(l => l.classList.contains('active-nav'));
