@@ -342,8 +342,8 @@ textarea::placeholder {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(253, 224, 71, 0.9) 30%, rgba(234, 179, 8, 0) 70%);
-  box-shadow: 0 0 20px rgba(253, 224, 71, 0.8);
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(253, 224, 71, 1) 40%, rgba(234, 179, 8, 0) 80%);
+  box-shadow: 0 0 30px 5px rgba(253, 224, 71, 1), 0 0 50px rgba(253, 224, 71, 0.8);
   transform: translate(-50%, -50%);
   z-index: 1;
   pointer-events: none;
