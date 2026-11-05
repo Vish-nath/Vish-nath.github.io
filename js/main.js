@@ -4,12 +4,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-/**
- * Vishwanath P Hesamani - Portfolio Main Script
- * Handles Dynamic Background Canvas, ScrollSpy Navigation, and Hardware-Accelerated Cursor Effects.
- */
-
-document.addEventListener('DOMContentLoaded', function () {
   // 1. Dynamic Interactive Background (Calm Tech / Gamer Node Network)
   const canvas = document.getElementById('bg-canvas');
   if (canvas) {
@@ -86,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (prefersReducedMotion) {
         const grad = ctx.createRadialGradient(width * 0.2, height * 0.2, 50, width * 0.2, height * 0.2, width * 0.6);
-        grad.addColorStop(0, 'rgba(37, 99, 235, 0.03)');
+        grad.addColorStop(0, 'rgba(147, 197, 253, 0.05)');
         grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, width, height);
@@ -191,8 +185,6 @@ document.addEventListener('DOMContentLoaded', function () {
           ctx.stroke();
         }
       }
-
-      requestAnimationFrame(animateCanvas);
 
       requestAnimationFrame(animateCanvas);
     }
