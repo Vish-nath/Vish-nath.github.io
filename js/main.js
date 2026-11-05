@@ -55,8 +55,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const devStrings = ['{ }', '< >', '</>', '[]'];
 
       for (let i = 0; i < particleCount; i++) {
-        // Soft calming colors based on theme: Primary Blue, Soft Indigo, Subtle Emerald
-        const colorBase = i % 3 === 0 ? '37, 99, 235' : (i % 3 === 1 ? '79, 70, 229' : '5, 150, 105');
+        // Soft calming colors matching the light slate/blue background (#f8fafc)
+        // Slate 400 (148, 163, 184), Slate 300 (203, 213, 225), Soft Blue (147, 197, 253)
+        const colorBase = i % 3 === 0 ? '148, 163, 184' : (i % 3 === 1 ? '203, 213, 225' : '147, 197, 253');
 
         particles.push({
           x: Math.random() * width,
@@ -96,11 +97,11 @@ document.addEventListener('DOMContentLoaded', function () {
       mouse.x += (mouse.targetX - mouse.x) * 0.05;
       mouse.y += (mouse.targetY - mouse.y) * 0.05;
 
-      // 1. Interactive Ambient Radial Glow around mouse (Soft Gamer/Cyber glow)
+      // 1. Interactive Ambient Radial Glow around mouse (Soft Light on Slate)
       if (mouse.x > 0 && mouse.y > 0) {
-        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 300);
-        mouseGlow.addColorStop(0, 'rgba(37, 99, 235, 0.04)');
-        mouseGlow.addColorStop(0.5, 'rgba(79, 70, 229, 0.015)');
+        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 350);
+        mouseGlow.addColorStop(0, 'rgba(147, 197, 253, 0.15)'); // Soft blue glow
+        mouseGlow.addColorStop(0.5, 'rgba(148, 163, 184, 0.05)'); // Soft slate
         mouseGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = mouseGlow;
         ctx.fillRect(0, 0, width, height);
@@ -158,8 +159,9 @@ document.addEventListener('DOMContentLoaded', function () {
           // Connect if close (using squared distance for performance)
           if (distSq < 15000) { // roughly 122px
             const dist = Math.sqrt(distSq);
-            const lineAlpha = (1 - dist / 122) * 0.12; // Very subtle lines
-            ctx.strokeStyle = `rgba(79, 70, 229, ${lineAlpha})`;
+            const lineAlpha = (1 - dist / 122) * 0.15; // Subtle mesh lines
+            // Soft slate-blue connection lines matching the theme
+            ctx.strokeStyle = `rgba(148, 163, 184, ${lineAlpha})`;
             ctx.lineWidth = 0.8;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
