@@ -46,8 +46,11 @@
   <!-- Interactive Dynamic Background Canvas -->
   <canvas id="bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none -z-10"></canvas>
 
-  <!-- Cursor Follower Ring -->
-  <div id="cursor-ring" class="hidden md:block pointer-events-none fixed z-[9999] w-8 h-8 border border-blue-500/60 rounded-full top-0 left-0 transition-opacity duration-300 opacity-0" style="will-change: transform, width, height, background-color, border-color; transform: translate3d(-100px, -100px, 0);"></div>
+  <!-- Custom 3D Dynamic Cursor -->
+  <div id="custom-cursor" class="flex pointer-events-none fixed z-[9999] top-0 left-0 transition-opacity duration-300 opacity-0 items-center justify-center cursor-idle" style="will-change: transform; transform: translate3d(-100px, -100px, 0); width: 40px; height: 40px; margin-left: -20px; margin-top: -20px;">
+    <div id="cursor-shape"></div>
+    <div id="cursor-tail"></div>
+  </div>
 
   <!-- Navigation Header -->
   <header class="fixed top-4 left-0 right-0 z-50 transition-all duration-300 pointer-events-none">

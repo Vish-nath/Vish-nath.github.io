@@ -43,31 +43,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initParticles() {
       particles = [];
-      // Lower density for a calming effect
-      const particleCount = Math.min(Math.floor((width * height) / 25000), 50);
-      const types = ['hex', 'hex', 'node', 'bracket'];
-      const devStrings = ['{ }', '< >', '</>', '[]'];
+      const particleCount = Math.min(Math.floor((width * height) / 8000), 200); // More particles for space field
+      const types = ['star', 'star', 'star', 'distant_star', 'distant_star', 'sparkle'];
 
       for (let i = 0; i < particleCount; i++) {
-        // Soft calming colors matching the light slate/blue background (#f8fafc)
-        // Slate 400 (148, 163, 184), Slate 300 (203, 213, 225), Soft Blue (147, 197, 253)
-        const colorBase = i % 3 === 0 ? '148, 163, 184' : (i % 3 === 1 ? '203, 213, 225' : '147, 197, 253');
+        // Space colors matching light theme: deeply saturated deep blues, indigos, purples, and bright whites
+        const colorBase = i % 4 === 0 ? '79, 70, 229' : (i % 4 === 1 ? '124, 58, 237' : (i % 4 === 2 ? '37, 99, 235' : '15, 23, 42'));
+        const type = types[Math.floor(Math.random() * types.length)];
+
+        let size, zIndex;
+        if (type === 'distant_star') {
+          size = Math.random() * 1.5 + 0.5;
+          zIndex = 0.2; // Slow parallax
+        } else if (type === 'sparkle') {
+          size = Math.random() * 2 + 1;
+          zIndex = 0.8;
+        } else {
+          size = Math.random() * 3 + 1.5;
+          zIndex = Math.random() * 0.5 + 0.5; // Depth factor for parallax
+        }
 
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          // Very slow, fluid drift
+          // True space drift
           vx: (Math.random() - 0.5) * 0.2,
           vy: (Math.random() - 0.5) * 0.2,
           phase: Math.random() * Math.PI * 2,
-          size: Math.random() * 4 + 3, // radius for nodes/hex
-          type: types[Math.floor(Math.random() * types.length)],
-          text: devStrings[Math.floor(Math.random() * devStrings.length)],
+          size: size,
+          type: type,
+          zIndex: zIndex,
           colorStr: colorBase,
-          baseAlpha: Math.random() * 0.15 + 0.05
+          baseAlpha: Math.random() * 0.5 + 0.2
         });
       }
     }
+
+    // Need to track previous mouse position for velocity (wind effect)
+    let prevMouse = { x: -1000, y: -1000 };
 
     window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('mousemove', (e) => {
@@ -80,110 +93,156 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (prefersReducedMotion) {
         const grad = ctx.createRadialGradient(width * 0.2, height * 0.2, 50, width * 0.2, height * 0.2, width * 0.6);
-        grad.addColorStop(0, 'rgba(147, 197, 253, 0.05)');
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
         grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, width, height);
         return;
       }
 
-      // Smooth mouse interpolation for fluid aura movement
-      mouse.x += (mouse.targetX - mouse.x) * 0.05;
-      mouse.y += (mouse.targetY - mouse.y) * 0.05;
+      // Track exact mouse velocity for wake/wind effect
+      const actualMouseVx = mouse.targetX - prevMouse.x;
+      const actualMouseVy = mouse.targetY - prevMouse.y;
+      prevMouse.x = mouse.targetX;
+      prevMouse.y = mouse.targetY;
 
-      // 1. Interactive Ambient Radial Glow around mouse (Soft Light on Slate)
+      // Smooth mouse interpolation for fluid aura movement
+      mouse.x += (mouse.targetX - mouse.x) * 0.1;
+      mouse.y += (mouse.targetY - mouse.y) * 0.1;
+
+      // 1. Interactive Ambient Radial Glow around mouse (Nebula Glow)
       if (mouse.x > 0 && mouse.y > 0) {
-        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 350);
-        mouseGlow.addColorStop(0, 'rgba(147, 197, 253, 0.15)'); // Soft blue glow
-        mouseGlow.addColorStop(0.5, 'rgba(148, 163, 184, 0.05)'); // Soft slate
+        // Deep purple/indigo space nebula glow blending into the light slate theme
+        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 450);
+        mouseGlow.addColorStop(0, 'rgba(99, 102, 241, 0.12)'); // Indigo core
+        mouseGlow.addColorStop(0.4, 'rgba(168, 85, 247, 0.05)'); // Purple mid
         mouseGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = mouseGlow;
         ctx.fillRect(0, 0, width, height);
       }
-
-      // 2. Render & Animate Floating Developer/Gamer Nodes
-      ctx.font = "14px 'JetBrains Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
 
       const tSec = time * 0.001;
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Extremely smooth, organic floating oscillation
-        p.x += p.vx + Math.sin(tSec * 0.3 + p.phase) * 0.1;
-        p.y += p.vy + Math.cos(tSec * 0.2 + p.phase) * 0.1;
+        // --- Interaction: Parallax space reaction to mouse movement ---
+        // Instead of blowing particles away, mouse movement shifts the camera viewpoint
+        // Deeper stars (lower zIndex) move less, closer stars move more.
 
-        // Gentle wrap around screen boundaries
+        // Calculate raw shift based on actual mouse movement
+        const parallaxShiftX = -actualMouseVx * p.zIndex * 0.15;
+        const parallaxShiftY = -actualMouseVy * p.zIndex * 0.15;
+
+        // Add momentum to the particle from the parallax shift to create a "warp/drift" trailing effect
+        p.vx += parallaxShiftX * 0.1;
+        p.vy += parallaxShiftY * 0.1;
+
+        // Apply velocities + natural drift
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Apply a very slow orbital rotation to the entire starfield for a cosmic feel
+        const cx = width / 2;
+        const cy = height / 2;
+        const dxCenter = p.x - cx;
+        const dyCenter = p.y - cy;
+        const distCenter = Math.sqrt(dxCenter*dxCenter + dyCenter*dyCenter);
+        if (distCenter > 0) {
+            // Very slow rotation
+            const rotSpeed = 0.0001 * p.zIndex;
+            p.x += -dyCenter * rotSpeed;
+            p.y += dxCenter * rotSpeed;
+        }
+
+        // Wrap around screen boundaries seamlessly
         if (p.x < -30) p.x = width + 30;
         if (p.x > width + 30) p.x = -30;
         if (p.y < -30) p.y = height + 30;
         if (p.y > height + 30) p.y = -30;
 
-        // Dynamic pulsing alpha for a calm breathing effect
-        const currentAlpha = p.baseAlpha + Math.sin(tSec * 1.5 + p.phase) * 0.05;
+        // Twinkling effect (alpha pulsing based on time and individual phase)
+        const twinkleSpeed = p.type === 'distant_star' ? 1.5 : 3;
+        const currentAlpha = Math.max(0.1, p.baseAlpha + Math.sin(tSec * twinkleSpeed + p.phase) * 0.3);
 
-        ctx.fillStyle = `rgba(${p.colorStr}, ${currentAlpha})`;
-        ctx.strokeStyle = `rgba(${p.colorStr}, ${currentAlpha})`;
-
-        // Draw particle based on type
-        if (p.type === 'hex') {
-          // Gamer vibe: Tech Hexagons
-          ctx.lineWidth = 1;
-          drawHexagon(p.x, p.y, p.size * 1.5);
-          ctx.stroke();
-        } else if (p.type === 'node') {
-          // Tech/Network Node
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
-        } else if (p.type === 'bracket') {
-          // Developer vibe: Subtle code brackets
-          ctx.fillText(p.text, p.x, p.y);
+        // Draw particle (Star)
+        ctx.beginPath();
+        if (p.type === 'sparkle') {
+            // Draw 4-point star/sparkle
+            ctx.fillStyle = `rgba(${p.colorStr}, ${currentAlpha + 0.3})`;
+            ctx.moveTo(p.x, p.y - p.size);
+            ctx.lineTo(p.x + p.size/3, p.y - p.size/3);
+            ctx.lineTo(p.x + p.size, p.y);
+            ctx.lineTo(p.x + p.size/3, p.y + p.size/3);
+            ctx.lineTo(p.x, p.y + p.size);
+            ctx.lineTo(p.x - p.size/3, p.y + p.size/3);
+            ctx.lineTo(p.x - p.size, p.y);
+            ctx.lineTo(p.x - p.size/3, p.y - p.size/3);
+            ctx.fill();
+        } else {
+            // Draw standard round star / distant star
+            const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 1.5);
+            glow.addColorStop(0, `rgba(${p.colorStr}, ${currentAlpha + 0.4})`);
+            glow.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = glow;
+            ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
+            ctx.fill();
         }
 
-        // Draw mesh network connections (Neural/Graph vibe)
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const distSq = dx * dx + dy * dy;
+        // Connect only the closest layer of stars into constellations (very subtly)
+        if (p.zIndex > 0.6) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            if (p2.zIndex <= 0.6) continue; // Only connect same depth layer
 
-          // Connect if close (using squared distance for performance)
-          if (distSq < 15000) { // roughly 122px
-            const dist = Math.sqrt(distSq);
-            const lineAlpha = (1 - dist / 122) * 0.15; // Subtle mesh lines
-            // Soft slate-blue connection lines matching the theme
-            ctx.strokeStyle = `rgba(148, 163, 184, ${lineAlpha})`;
-            ctx.lineWidth = 0.8;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < 15000) { // roughly 122px
+              const dist = Math.sqrt(distSq);
+              const lineAlpha = (1 - dist / 122) * 0.1;
+              // Subtle indigo constellation lines
+              ctx.strokeStyle = `rgba(99, 102, 241, ${lineAlpha})`;
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
           }
         }
 
-        // Very soft magnetic pull to mouse (Calm interaction)
-        const mdx = mouse.x - p.x;
-        const mdy = mouse.y - p.y;
+        // --- Gravity Well Effect (Black Hole / Singularity near mouse) ---
+        const mdx = mouse.targetX - p.x;
+        const mdy = mouse.targetY - p.y;
         const mdistSq = mdx * mdx + mdy * mdy;
 
-        if (mdistSq < 40000) { // roughly 200px
+        if (mdistSq < 90000) { // roughly 300px radius
           const mdist = Math.sqrt(mdistSq);
-          // Gently pull particles toward mouse
-          p.x += mdx * 0.0005;
-          p.y += mdy * 0.0005;
 
-          // Softly highlight the connection to the user's cursor
-          const mAlpha = (1 - mdist / 200) * 0.15;
-          ctx.strokeStyle = `rgba(${p.colorStr}, ${mAlpha})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(mouse.x, mouse.y);
-          ctx.stroke();
+          // Gentle orbital pull - stars circle the cursor
+          // Calculate tangent vector
+          const tx = -mdy / mdist;
+          const ty = mdx / mdist;
+
+          const force = (300 - mdist) / 300;
+
+          // Pull inwards slightly, but mostly push tangentially (orbit)
+          p.vx += (mdx / mdist * 0.005 * force) + (tx * 0.02 * force);
+          p.vy += (mdy / mdist * 0.005 * force) + (ty * 0.02 * force);
         }
+
+        // Space friction (vacuum) - mostly maintain momentum but slow down huge spikes
+        p.vx *= 0.95;
+        p.vy *= 0.95;
+
+        // Cap maximum particle speed (Warp speed limit)
+        const maxSpeed = 8 * p.zIndex; // Closer stars can move much faster
+        if (p.vx > maxSpeed) p.vx = maxSpeed;
+        if (p.vx < -maxSpeed) p.vx = -maxSpeed;
+        if (p.vy > maxSpeed) p.vy = maxSpeed;
+        if (p.vy < -maxSpeed) p.vy = -maxSpeed;
       }
 
       requestAnimationFrame(animateCanvas);
@@ -288,48 +347,162 @@ document.addEventListener('DOMContentLoaded', function () {
     }, { passive: true });
   }
 
-  // 3. New Popular Cursor Follow Up Animation (Ring)
-  const cursorRing = document.getElementById('cursor-ring');
+  // 3. Custom 3D Dynamic Cursor with State Animations
+  const customCursor = document.getElementById('custom-cursor');
+  const cursorShape = document.getElementById('cursor-shape');
 
-  if (cursorRing && !prefersReducedMotion && window.matchMedia('(pointer: fine)').matches) {
+  if (customCursor) {
+    document.body.classList.add('has-custom-cursor');
+
     let mouseX = -100;
     let mouseY = -100;
-    let ringX = -100;
-    let ringY = -100;
+    let cursorX = -100;
+    let cursorY = -100;
 
-    // Show cursor ring when mouse moves
+    // State tracking
+    let isHovering = false;
+    let isMouseDown = false;
+    let isDragging = false;
+    let dragThreshold = 3;
+    let startX = 0;
+    let startY = 0;
+
+    // Show cursor when mouse moves
     window.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
-      if (cursorRing.classList.contains('opacity-0')) {
-        cursorRing.classList.remove('opacity-0');
-        cursorRing.classList.add('opacity-100');
+
+      if (customCursor.classList.contains('opacity-0')) {
+        customCursor.classList.remove('opacity-0');
+        customCursor.classList.add('opacity-100');
+      }
+
+      // Drag detection
+      if (isMouseDown && !isDragging) {
+        if (Math.abs(mouseX - startX) > dragThreshold || Math.abs(mouseY - startY) > dragThreshold) {
+          isDragging = true;
+          updateCursorState();
+        }
       }
     }, { passive: true });
 
-    const interactiveTags = 'a, button, input, textarea, select, label, .project-card, .frosted-glass-panel';
+    // Click and Drag event listeners
+    window.addEventListener('mousedown', (e) => {
+      isMouseDown = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      updateCursorState();
+
+      // Emit Light Wave Animation
+      const wave = document.createElement('div');
+      wave.className = 'light-wave';
+      customCursor.appendChild(wave);
+      setTimeout(() => {
+        if (wave.parentNode) {
+          wave.parentNode.removeChild(wave);
+        }
+      }, 600);
+    });
+
+    window.addEventListener('mouseup', () => {
+      isMouseDown = false;
+      isDragging = false;
+      updateCursorState();
+    });
+
+    const interactiveTags = 'a, button, input, textarea, select, label, .project-card, .frosted-glass-panel, .cursor-pointer';
+
     window.addEventListener('mouseover', (e) => {
       if (e.target.closest(interactiveTags)) {
-        cursorRing.classList.add('hover-active');
+        isHovering = true;
+        updateCursorState();
       }
     }, { passive: true });
 
     window.addEventListener('mouseout', (e) => {
       if (e.target.closest(interactiveTags)) {
-        cursorRing.classList.remove('hover-active');
+        isHovering = false;
+        updateCursorState();
       }
     }, { passive: true });
 
-    // Smooth GPU-accelerated translate3d follower loop
-    function animateCursorRing() {
-      // Smooth linear interpolation for the trailing effect
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
+    function updateCursorState() {
+      // Base classes to remove
+      customCursor.classList.remove('cursor-idle', 'cursor-moving', 'cursor-hover', 'cursor-click', 'cursor-drag');
+
+      if (isDragging) {
+        customCursor.classList.add('cursor-drag');
+      } else if (isMouseDown) {
+        customCursor.classList.add('cursor-click');
+      } else if (isHovering) {
+        customCursor.classList.add('cursor-hover');
+      }
+      // Note: Idle and Moving are dynamically added in the loop based on velocity
+    }
+
+    // Initialize state
+    updateCursorState();
+
+    // Smooth GPU-accelerated translate3d loop
+    function animateCursor() {
+      // Calculate velocity for squash/stretch effect and idle/moving states
+      let dx = mouseX - cursorX;
+      let dy = mouseY - cursorY;
+      let velocity = Math.sqrt(dx * dx + dy * dy);
+
+      // Interpolate position
+      cursorX += dx * 0.2;
+      cursorY += dy * 0.2;
+
+      const cursorTail = document.getElementById('cursor-tail');
+
+      // Handle idle vs moving states if not in an interaction state
+      if (!isHovering && !isMouseDown && !isDragging) {
+        if (velocity < 0.5) {
+          if (!customCursor.classList.contains('cursor-idle')) {
+            customCursor.classList.remove('cursor-moving');
+            customCursor.classList.add('cursor-idle');
+            cursorShape.style.transform = ''; // Clear dynamic transform
+            if(cursorTail) cursorTail.style.transform = `translate(-50%, -50%)`;
+          }
+        } else {
+          if (!customCursor.classList.contains('cursor-moving')) {
+            customCursor.classList.remove('cursor-idle');
+            customCursor.classList.add('cursor-moving');
+          }
+          // Dynamic stretch based on velocity
+          let angle = Math.atan2(dy, dx) * 180 / Math.PI;
+          let squeeze = Math.min(velocity * 0.02, 0.4); // max squeeze 0.4
+          let scaleX = 1 + squeeze;
+          let scaleY = 1 - squeeze;
+          cursorShape.style.transform = `rotate(${angle}deg) scale(${scaleX}, ${scaleY})`;
+
+          // Enhanced Comet Tail logic
+          if(cursorTail) {
+              // Tail stretches significantly more based on speed (up to 120px)
+              let tailStretch = Math.min(velocity * 4, 120);
+
+              // Shift the tail backwards (-tailStretch/2) so it originates from the sun
+              // and scale it up to create a glowing comet tail effect.
+              cursorTail.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateX(-${tailStretch/2}px) scaleX(${1 + tailStretch/10}) scaleY(${1 - squeeze/2})`;
+
+              // Increase opacity of tail based on speed, max at 1.0 for brighter glow
+              cursorTail.style.opacity = Math.min(velocity * 0.1, 1);
+          }
+        }
+      } else {
+        // Reset transform when interacting (CSS classes handle the specific transforms)
+        cursorShape.style.transform = '';
+        if(cursorTail) {
+            cursorTail.style.transform = `translate(-50%, -50%)`;
+            cursorTail.style.opacity = 0;
+        }
+      }
 
       // Translate by center
-      cursorRing.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0)`;
-      requestAnimationFrame(animateCursorRing);
+      customCursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
+      requestAnimationFrame(animateCursor);
     }
-    requestAnimationFrame(animateCursorRing);
+    requestAnimationFrame(animateCursor);
   }
 });
