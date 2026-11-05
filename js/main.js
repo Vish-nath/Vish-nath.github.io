@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function initParticles() {
       particles = [];
-      const particleCount = Math.min(Math.floor((width * height) / 25000), 50);
-      const types = ['pixel', 'pixel', 'dev_text'];
-      const devStrings = ['{ }', '< />', '0x01', 'sys', '[]', ';;', '=>', 'npm'];
+      const particleCount = Math.min(Math.floor((width * height) / 22000), 60);
+      const types = ['pixel', 'pixel', 'dev_text', 'binary'];
+      const devStrings = ['{ }', '< />', '0x01', 'sudo', '=>', 'npm run', 'async', 'await', 'git push', '===', 'var'];
 
       for (let i = 0; i < particleCount; i++) {
         // Randomly assign one of the 3 theme colors directly mapping to your CSS palette
@@ -41,13 +41,14 @@ document.addEventListener('DOMContentLoaded', function () {
           y: Math.random() * height,
           // Upward drift to simulate 2D platformer parallax or scrolling terminal
           vx: (Math.random() - 0.5) * 0.4,
-          vy: -(Math.random() * 0.5 + 0.2),
+          vy: -(Math.random() * 0.6 + 0.2),
           phase: Math.random() * Math.PI * 2,
-          size: Math.floor(Math.random() * 2 + 1) * 8, // 8px or 16px retro blocks
+          size: Math.floor(Math.random() * 2 + 1) * 6, // 6px or 12px retro blocks
           type: types[Math.floor(Math.random() * types.length)],
           text: devStrings[Math.floor(Math.random() * devStrings.length)],
           color: colorVal,
-          baseAlpha: Math.random() * 0.3 + 0.1
+          baseAlpha: Math.random() * 0.3 + 0.1,
+          pulseSpeed: Math.random() * 0.05 + 0.02
         });
       }
     }
@@ -165,8 +166,13 @@ document.addEventListener('DOMContentLoaded', function () {
           // Draw standard retro pixel blocks
           ctx.fillRect(renderX, renderY, p.size, p.size);
         } else if (p.type === 'dev_text') {
-          // Draw developer syntax strings like floating retro coins
-          ctx.fillText(p.text, renderX, renderY);
+          // Draw developer syntax strings like floating retro coins with blinking terminal cursor
+          const showCursor = Math.floor(time * p.pulseSpeed) % 2 === 0;
+          ctx.fillText(p.text + (showCursor ? '_' : ''), renderX, renderY);
+        } else if (p.type === 'binary') {
+          // Matrix-style falling binary strings
+          const bin = Math.floor(time * p.pulseSpeed * 0.5) % 2 === 0 ? '1' : '0';
+          ctx.fillText(bin, renderX, renderY);
         }
 
         // Mouse Repulsion & Interaction (The cursor acts like a player dodging elements)
