@@ -4,14 +4,19 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
-  // 1. Dynamic Interactive Retro Pixel & Energy Grid Background
+/**
+ * Vishwanath P Hesamani - Portfolio Main Script
+ * Handles Dynamic Background Canvas, ScrollSpy Navigation, and Hardware-Accelerated Cursor Effects.
+ */
+
+document.addEventListener('DOMContentLoaded', function () {
+  // 1. Dynamic Interactive Background (Calm Tech / Gamer Node Network)
   const canvas = document.getElementById('bg-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
     let width = 0;
     let height = 0;
     let particles = [];
-    let canvasRipples = [];
     let mouse = { x: -1000, y: -1000, targetX: -1000, targetY: -1000 };
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -26,29 +31,45 @@ document.addEventListener('DOMContentLoaded', function () {
       initParticles();
     }
 
+    function drawHexagon(x, y, size) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle_deg = 60 * i - 30;
+        const angle_rad = Math.PI / 180 * angle_deg;
+        const vx = x + size * Math.cos(angle_rad);
+        const vy = y + size * Math.sin(angle_rad);
+        if (i === 0) {
+          ctx.moveTo(vx, vy);
+        } else {
+          ctx.lineTo(vx, vy);
+        }
+      }
+      ctx.closePath();
+    }
+
     function initParticles() {
       particles = [];
-      const particleCount = Math.min(Math.floor((width * height) / 22000), 60);
-      const types = ['pixel', 'pixel', 'dev_text', 'binary'];
-      const devStrings = ['{ }', '< />', '0x01', 'sudo', '=>', 'npm run', 'async', 'await', 'git push', '===', 'var'];
+      // Lower density for a calming effect
+      const particleCount = Math.min(Math.floor((width * height) / 25000), 50);
+      const types = ['hex', 'hex', 'node', 'bracket'];
+      const devStrings = ['{ }', '< >', '</>', '[]'];
 
       for (let i = 0; i < particleCount; i++) {
-        // Randomly assign one of the 3 theme colors directly mapping to your CSS palette
-        const colorVal = i % 3 === 0 ? 'rgba(37, 99, 235, ' : (i % 3 === 1 ? 'rgba(79, 70, 229, ' : 'rgba(5, 150, 105, ');
+        // Soft calming colors based on theme: Primary Blue, Soft Indigo, Subtle Emerald
+        const colorBase = i % 3 === 0 ? '37, 99, 235' : (i % 3 === 1 ? '79, 70, 229' : '5, 150, 105');
 
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          // Upward drift to simulate 2D platformer parallax or scrolling terminal (Slowed Down)
-          vx: (Math.random() - 0.5) * 0.15,
-          vy: -(Math.random() * 0.25 + 0.1),
+          // Very slow, fluid drift
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: (Math.random() - 0.5) * 0.2,
           phase: Math.random() * Math.PI * 2,
-          size: Math.floor(Math.random() * 2 + 1) * 6, // 6px or 12px retro blocks
+          size: Math.random() * 4 + 3, // radius for nodes/hex
           type: types[Math.floor(Math.random() * types.length)],
           text: devStrings[Math.floor(Math.random() * devStrings.length)],
-          color: colorVal,
-          baseAlpha: Math.random() * 0.3 + 0.1,
-          pulseSpeed: Math.random() * 0.02 + 0.01 // Slower blinking/matrix effect
+          colorStr: colorBase,
+          baseAlpha: Math.random() * 0.15 + 0.05
         });
       }
     }
@@ -59,21 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
       mouse.targetY = e.clientY;
     }, { passive: true });
 
-    // Canvas click ripple effect
-    window.addEventListener('click', (e) => {
-      if (!prefersReducedMotion) {
-        canvasRipples.push({
-          x: e.clientX,
-          y: e.clientY,
-          radius: 10,
-          maxRadius: Math.min(width, height) * 0.35,
-          alpha: 0.6,
-          speed: 6
-        });
-      }
-    }, { passive: true });
-
-    let lastTime = 0;
     function animateCanvas(time) {
       ctx.clearRect(0, 0, width, height);
 
@@ -87,57 +93,21 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // Smooth mouse interpolation for fluid aura movement
-      mouse.x += (mouse.targetX - mouse.x) * 0.1;
-      mouse.y += (mouse.targetY - mouse.y) * 0.1;
+      mouse.x += (mouse.targetX - mouse.x) * 0.05;
+      mouse.y += (mouse.targetY - mouse.y) * 0.05;
 
-      // 1. Scrolling Retro 2D Game Grid (Blueprint Style)
-      ctx.strokeStyle = 'rgba(37, 99, 235, 0.04)'; // Subtle blue tint matching background
-      ctx.lineWidth = 1;
-      const gridSize = 40;
-      // Calculate scroll offset based on time to simulate 2D camera movement (moving up - slowed down)
-      const scrollY = (time * 0.008) % gridSize;
-
-      ctx.beginPath();
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.moveTo(x, 0); ctx.lineTo(x, height);
-      }
-      for (let y = -gridSize; y < height; y += gridSize) {
-        // Apply vertical scroll offset
-        const drawY = y + scrollY;
-        ctx.moveTo(0, drawY); ctx.lineTo(width, drawY);
-      }
-      ctx.stroke();
-
-      // 2. Interactive Ambient Radial Glow around mouse
+      // 1. Interactive Ambient Radial Glow around mouse (Soft Gamer/Cyber glow)
       if (mouse.x > 0 && mouse.y > 0) {
-        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 220);
-        mouseGlow.addColorStop(0, 'rgba(37, 99, 235, 0.06)');
-        mouseGlow.addColorStop(0.5, 'rgba(79, 70, 229, 0.02)');
+        const mouseGlow = ctx.createRadialGradient(mouse.x, mouse.y, 10, mouse.x, mouse.y, 300);
+        mouseGlow.addColorStop(0, 'rgba(37, 99, 235, 0.04)');
+        mouseGlow.addColorStop(0.5, 'rgba(79, 70, 229, 0.015)');
         mouseGlow.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = mouseGlow;
         ctx.fillRect(0, 0, width, height);
       }
 
-      // 3. Render Canvas Shockwave Ripples
-      for (let r = canvasRipples.length - 1; r >= 0; r--) {
-        const rip = canvasRipples[r];
-        rip.radius += rip.speed;
-        rip.alpha -= 0.015;
-
-        if (rip.alpha <= 0 || rip.radius >= rip.maxRadius) {
-          canvasRipples.splice(r, 1);
-          continue;
-        }
-
-        ctx.strokeStyle = `rgba(79, 70, 229, ${rip.alpha * 0.4})`;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-        // Render & Animate Retro Game / Developer Elements
-      ctx.font = "bold 13px 'JetBrains Mono', monospace";
+      // 2. Render & Animate Floating Developer/Gamer Nodes
+      ctx.font = "14px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -146,56 +116,81 @@ document.addEventListener('DOMContentLoaded', function () {
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Fluid floating with subtle horizontal sine wave (Slowed down oscillation)
-        p.x += p.vx + Math.sin(tSec * 0.5 + p.phase) * 0.15;
-        p.y += p.vy;
+        // Extremely smooth, organic floating oscillation
+        p.x += p.vx + Math.sin(tSec * 0.3 + p.phase) * 0.1;
+        p.y += p.vy + Math.cos(tSec * 0.2 + p.phase) * 0.1;
 
-        // Wrap around screen boundaries cleanly
+        // Gentle wrap around screen boundaries
         if (p.x < -30) p.x = width + 30;
         if (p.x > width + 30) p.x = -30;
         if (p.y < -30) p.y = height + 30;
         if (p.y > height + 30) p.y = -30;
 
-        ctx.fillStyle = p.color + p.baseAlpha + ')';
+        // Dynamic pulsing alpha for a calm breathing effect
+        const currentAlpha = p.baseAlpha + Math.sin(tSec * 1.5 + p.phase) * 0.05;
 
-        // Draw retro entities snapped to virtual pixel grid (gives an 8-bit rendering feel)
-        const renderX = Math.floor(p.x / 4) * 4;
-        const renderY = Math.floor(p.y / 4) * 4;
+        ctx.fillStyle = `rgba(${p.colorStr}, ${currentAlpha})`;
+        ctx.strokeStyle = `rgba(${p.colorStr}, ${currentAlpha})`;
 
-        if (p.type === 'pixel') {
-          // Draw standard retro pixel blocks
-          ctx.fillRect(renderX, renderY, p.size, p.size);
-        } else if (p.type === 'dev_text') {
-          // Draw developer syntax strings like floating retro coins with blinking terminal cursor
-          const showCursor = Math.floor(time * p.pulseSpeed) % 2 === 0;
-          ctx.fillText(p.text + (showCursor ? '_' : ''), renderX, renderY);
-        } else if (p.type === 'binary') {
-          // Matrix-style falling binary strings
-          const bin = Math.floor(time * p.pulseSpeed * 0.5) % 2 === 0 ? '1' : '0';
-          ctx.fillText(bin, renderX, renderY);
+        // Draw particle based on type
+        if (p.type === 'hex') {
+          // Gamer vibe: Tech Hexagons
+          ctx.lineWidth = 1;
+          drawHexagon(p.x, p.y, p.size * 1.5);
+          ctx.stroke();
+        } else if (p.type === 'node') {
+          // Tech/Network Node
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.type === 'bracket') {
+          // Developer vibe: Subtle code brackets
+          ctx.fillText(p.text, p.x, p.y);
         }
 
-        // Mouse Repulsion & Interaction (The cursor acts like a player dodging elements)
-        const mdx = p.x - mouse.x;
-        const mdy = p.y - mouse.y;
-        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mdist < 100) {
-          // Push particles away smoothly
-          p.x += mdx * 0.02;
-          p.y += mdy * 0.02;
+        // Draw mesh network connections (Neural/Graph vibe)
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const distSq = dx * dx + dy * dy;
 
-          // Draw interaction link
-          const mAlpha = (1 - mdist / 100) * 0.25;
-          ctx.strokeStyle = p.color + mAlpha + ')';
-          ctx.lineWidth = 1.5;
+          // Connect if close (using squared distance for performance)
+          if (distSq < 15000) { // roughly 122px
+            const dist = Math.sqrt(distSq);
+            const lineAlpha = (1 - dist / 122) * 0.12; // Very subtle lines
+            ctx.strokeStyle = `rgba(79, 70, 229, ${lineAlpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+
+        // Very soft magnetic pull to mouse (Calm interaction)
+        const mdx = mouse.x - p.x;
+        const mdy = mouse.y - p.y;
+        const mdistSq = mdx * mdx + mdy * mdy;
+
+        if (mdistSq < 40000) { // roughly 200px
+          const mdist = Math.sqrt(mdistSq);
+          // Gently pull particles toward mouse
+          p.x += mdx * 0.0005;
+          p.y += mdy * 0.0005;
+
+          // Softly highlight the connection to the user's cursor
+          const mAlpha = (1 - mdist / 200) * 0.15;
+          ctx.strokeStyle = `rgba(${p.colorStr}, ${mAlpha})`;
+          ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.moveTo(renderX, renderY);
-          // Snap lines to 90 degrees for tech/retro look
-          ctx.lineTo(renderX, mouse.y);
+          ctx.moveTo(p.x, p.y);
           ctx.lineTo(mouse.x, mouse.y);
           ctx.stroke();
         }
       }
+
+      requestAnimationFrame(animateCanvas);
 
       requestAnimationFrame(animateCanvas);
     }
